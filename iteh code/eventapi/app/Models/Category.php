@@ -15,5 +15,8 @@ class Category extends Model
         //
     ];
 
-    
+      public function eventovi()
+    {
+        return $this->hasMany(Event::class, 'idCategory');
+    }
 }
