@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Event extends Model
 {
     //
+
+    protected $table = 'events';
+
+     /** @use HasFactory<\Database\Factories\EventFactory> */
     protected $fillable = [
 
         "idUser",
