@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class EventParticipation extends Model
 {
+    use HasFactory;
     protected $table = 'event_participations';
  protected $fillable = [
         "idEvent",
@@ -18,7 +19,7 @@ class EventParticipation extends Model
     
     
     protected $casts = [
-        'status' => \App\Enums\ParticipationStatus::class,
+        'status' => \App\ParticipationStatus::class,
         'registeredAt' => 'datetime',
         'cancelledAt' => 'datetime',
         'attendanceMarkedAt' => 'datetime'

@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Event extends Model
 {
     //
-
+    use HasFactory;
     protected $table = 'events';
 
      /** @use HasFactory<\Database\Factories\EventFactory> */
@@ -28,7 +28,7 @@ class Event extends Model
     'startAt' => 'datetime',
     'endAt'   => 'datetime',
     'capacity'=> 'integer',
-    'status'  => \App\Enums\EventStatus::class, // cast ka enum
+    'status'  => \App\EventStatus::class, // cast ka enum
 ];
 
 

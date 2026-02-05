@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Notification extends Model
 {
+    use HasFactory;
     protected $table = 'notifications';
     protected $fillable = [
         "idUser",
@@ -19,7 +20,7 @@ class Notification extends Model
     
     
     protected $casts = [
-         "type" => \App\Enums\NotificationType::class,
+         "type" => \App\NotificationType::class,
          "createdAt" => 'datetime',
             "seen" => 'boolean'
 
