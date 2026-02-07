@@ -9,7 +9,10 @@ class Event extends Model
     //
     use HasFactory;
     protected $table = 'events';
-
+    
+    protected $primaryKey = 'idEvent'; // <-- tvoje ime PK
+    public $incrementing = true;
+    protected $keyType = 'int';
      /** @use HasFactory<\Database\Factories\EventFactory> */
     protected $fillable = [
 

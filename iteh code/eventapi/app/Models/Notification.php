@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Notification extends Model
 {
     use HasFactory;
+       protected $primaryKey = 'idNotification';
+    public $incrementing = true;
+    protected $keyType = 'int';
     protected $table = 'notifications';
     protected $fillable = [
         "idUser",
