@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventParticipationController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AuthController;
 
 //Category routes
 
@@ -44,3 +45,25 @@ Route::get('/notifications/{id}', [NotificationController::class, 'show']);
 Route::post('/notifications', [NotificationController::class, 'store']);
 Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 Route::put('/notifications/{id}', [NotificationController::class, 'update']);
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+
+Route::get('/email/verify/{id}', function (Request $request, $id) {
+    if (!$request->hasValidSignature()) {
+        return response()->json(['message' => 'Nevažeći verifikacioni link.'], 401);
+    }
+
+    $user = App\Models\User::findOrFail($id);
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email adresa je već verifikovana.'], 400);
+    }
+
+    $user->markEmailAsVerified();
+    return response()->json(['message' => 'Email adresa je uspešno verifikovana.']);
+})->name('verification.verify');

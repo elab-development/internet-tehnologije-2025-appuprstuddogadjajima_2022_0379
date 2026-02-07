@@ -7,10 +7,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use App\Mail\VerifyMail;
 class AuthController extends Controller
 {
     //
-
+    //POST /api/register
     public function register(Request $request)
     {
         //
@@ -42,17 +45,25 @@ class AuthController extends Controller
             'isActive' => $data['isActive'],
         ]);
 
-    $token = $user->createToken('api_token')->plainTextToken;
-    return response()->json([
+        $url = URL::temporarySignedRoute(
+            'verification.verify', 
+            now()->addMinutes(60), 
+            ['id' => $user->id]
+        );
+        Mail::to($user->email)->send(new VerifyMail($user, $url));
+
+
+         $token = $user->createToken('api_token')->plainTextToken;
+        return response()->json([
         'message' => 'Registracija je uspesna',
         'user' => $user,
         'token' => $token
-    ], 201);
+        ], 201);
       
 
 
     }
-
+    //POST /api/login
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -76,17 +87,19 @@ class AuthController extends Controller
         }
 
 
+        $user = Auth::user();
 
 
 
-        $data = $validator->validated();
-        $user = User::where('email', $data['email'])->first();
+        //$data = $validator->validated();
+        //$user = User::where('email', $data['email'])->first();
 
-        if(!$user || !Hash::check($data['password'], $user->password)){
+       /* if(!$user || !Hash::check($data['password'], $user->password)){
             return response()->json([
                 'message' => 'Neispravna email ili lozinka'
             ], 401);
-        }
+        }*/
+
 
         $token = $user->createToken('api_token')->plainTextToken;
         return response()->json([
@@ -99,10 +112,25 @@ class AuthController extends Controller
 
     }
 
+    //POST /api/logout
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'message' => 'Uspesna odjava'
+        ], 200);
 
 
+    }
 
-
+    //GET /api/me
+    public function me(Request $request)
+    {
+        return response()->json([
+            'user' => $request->user()
+        ], 200);
+    }
 
 
 
