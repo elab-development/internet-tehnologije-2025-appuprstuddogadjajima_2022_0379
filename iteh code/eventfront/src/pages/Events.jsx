@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Events.css";
 
-const API_BASE = "http://localhost:8000"; // promeni ako treba
+const API_BASE = "http://localhost:8000"; 
 
 function formatDT(dt) {
   if (!dt) return "-";
@@ -21,7 +21,6 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
-  // filteri
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("ALL");
   const [category, setCategory] = useState("ALL");
@@ -50,7 +49,6 @@ export default function EventsPage() {
 
         const data = await res.json();
 
-        // podrška za: [..] ili { data: [..] }
         const list = Array.isArray(data) ? data : data?.data ?? [];
         setEvents(list);
       } catch (e) {
