@@ -24,8 +24,8 @@ class AuthController extends Controller
             'lastName' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:STUDENT,ORGANIZATOR,ADMINISTRATOR',
-            'isActive' => 'required|boolean',
+          //  'role' => 'required|string|in:STUDENT,ORGANIZATOR,ADMINISTRATOR',
+            //'isActive' => 'required|boolean',
         ]);
 
         if($validator->fails()){
@@ -36,14 +36,16 @@ class AuthController extends Controller
         }
 
         $data = $validator->validated();
-        $user = User::create([
-            'firstName' => $data['firstName'],
-            'lastName' => $data['lastName'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'role' => $data['role'],
-            'isActive' => $data['isActive'],
-        ]);
+      $user = User::create([
+    'firstName' => $data['firstName'],
+    'lastName'  => $data['lastName'],
+    'email'     => $data['email'],
+    'password'  => bcrypt($data['password']),
+
+    // 👇 DEFAULT VREDNOSTI
+    'role'     => 'STUDENT',
+    'isActive' => true,
+]);
 
         $url = URL::temporarySignedRoute(
             'verification.verify', 

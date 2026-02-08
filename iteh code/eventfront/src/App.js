@@ -12,6 +12,7 @@ import Events from './pages/Events';
 import EventDetails from './pages/EventDetails';
 import CreateEvent from './pages/CreateEvent';
 import Footer from './components/Footer';
+import { RegisterPage } from "./pages/Register";
 
 function App() {
   return (
@@ -19,8 +20,27 @@ function App() {
       <BrowserRouter>
       <Navbar>  </Navbar>
         <Routes>
+           <Route path="/events" element={<Events />} />
           <Route path="/" element={<Pocetna />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+  path="/login"
+  element={
+    <div className="page">
+      <LoginPage />
+    </div>
+  }
+/>
+
+<Route
+  path="/register"
+  element={
+    <div className="page">
+      <RegisterPage />
+    </div>
+  }
+/>
+
+
 
           {/*<Route path="/" element={<Home />} />
           <Route path="/events" element={<Events />} />

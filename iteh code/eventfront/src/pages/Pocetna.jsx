@@ -41,8 +41,7 @@ const Pocetna = () => {
 
       
       <div className="pocetna-actions">
-        <Link to="/events" className="btn primary">Pregled događaja</Link>
-        <Link to="/login" className="btn secondary">Prijava</Link>
+       
       </div>
 
       
@@ -58,7 +57,7 @@ const Pocetna = () => {
 </div>
 
       <p className="status">
-        Sistem razvijen u okviru predmeta Internet tehnologije Ua blokaderi strokaderi.
+        Sistem razvijen u okviru predmeta Internet tehnologije.
       </p>
 
     </div>

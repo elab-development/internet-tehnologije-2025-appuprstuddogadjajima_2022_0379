@@ -1,3 +1,11 @@
-export default function Events() {
-  return <h1>Events</h1>;
+import React from 'react'
+
+const Events = () => {
+  return (
+    <div>
+      Moji eventovi
+    </div>
+  )
 }
+
+export default Events

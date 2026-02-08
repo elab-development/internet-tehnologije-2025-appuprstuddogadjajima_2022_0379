@@ -1,0 +1,31 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 14px 28px;
+  background: #020617;
+  border-bottom: 1px solid #1e293b;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #cbd5f5;
+  font-size: 15px;
+  font-weight: 500;
+
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.nav-link.active {
+  background: #3b82f6;
+  color: white;
+}
