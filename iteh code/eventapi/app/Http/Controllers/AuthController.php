@@ -42,7 +42,6 @@ class AuthController extends Controller
     'email'     => $data['email'],
     'password'  => bcrypt($data['password']),
 
-    // 👇 DEFAULT VREDNOSTI
     'role'     => 'STUDENT',
     'isActive' => true,
 ]);
