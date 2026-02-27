@@ -54,11 +54,11 @@ class AuthController extends Controller
         Mail::to($user->email)->send(new VerifyMail($user, $url));
 
 
-         $token = $user->createToken('api_token')->plainTextToken;
+       //  $token = $user->createToken('api_token')->plainTextToken;
         return response()->json([
         'message' => 'Registracija je uspesna',
         'user' => $user,
-        'token' => $token
+        //'token' => $token
         ], 201);
       
 
@@ -133,13 +133,25 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function verifyEmail(Request $request, $id)
+    {
+
+        if(!$request->hasValidSignature()) {
+            return response()->json(['message' => 'Nevažeći verifikacioni link.'], 401);
+        }
+
+        $user = User::findOrFail($id);
+        if($user->email_verified_at) {
+            return response()->json(['message' => 'Email već verifikovan.'], 200);
+        }
+        $user->email_verified_at = now();
+        $user->save();
+        return response()->json(['message' => 'Email uspešno verifikovan.'], 200);
 
 
 
 
 
 
-
-
-
+}
 }

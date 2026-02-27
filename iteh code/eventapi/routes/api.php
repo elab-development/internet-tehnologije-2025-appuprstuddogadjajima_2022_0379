@@ -8,7 +8,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventParticipationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\ForgotPasswordController;
 //Category routes
 
 Route::resource('/categories', CategoryController::class)->except(['create', 'edit']);
@@ -67,3 +67,7 @@ Route::get('/email/verify/{id}', function (Request $request, $id) {
     $user->markEmailAsVerified();
     return response()->json(['message' => 'Email adresa je uspešno verifikovana.']);
 })->name('verification.verify');
+
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);

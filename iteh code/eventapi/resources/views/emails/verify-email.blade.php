@@ -1,5 +1,6 @@
 <x-mail::message>
 Verifikacija naloga
+
 Zdravo {{ $user->firstName }},
 
 Hvala ti na registraciji na {{ config('app.name') }} 

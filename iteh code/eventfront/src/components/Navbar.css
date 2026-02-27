@@ -29,3 +29,40 @@
   background: #3b82f6;
   color: white;
 }
+
+.navbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-right .nav-link {
+  padding: 6px 14px;
+}
+.nav-link.register {
+  background: #10b981;
+  color: white;
+}
+.nav-link.register:hover {
+  background: #059669;
+}
+.nav-link.login {
+  background: #3b82f6;
+  color: white;
+}
+
+.nav-link.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 10px; 
+  border-radius: 6px;
+  color: #cbd5f5;
+}
+.nav-link.logout-btn:hover {
+  background: #1e293b;
+  color: white;
+}
+

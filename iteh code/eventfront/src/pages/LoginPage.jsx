@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./LoginPage.css";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
+import PrimaryButton from "../components/PrimaryButton";
 export const LoginPage = () => {
 
   const navigate = useNavigate();
@@ -106,9 +107,9 @@ console.log("LS TOKEN:", localStorage.getItem("token"));
         </div>
         {info && <div className="auth-alert auth-alert-info">{info}</div>}
         {error && <div className="auth-alert auth-alert-error">{error}</div>}
-        <button type="submit" className="login-btn" disabled={loading}>
-          {loading? "Prijavljivanje..." : "Prijavi se"}
-        </button>
+            <PrimaryButton type="submit" loading={loading} loadingText="Prijavljivanje...">
+              Prijavi se
+            </PrimaryButton>
       </form>
     </div>
   );

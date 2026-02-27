@@ -3,6 +3,7 @@ import "./Register.css";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 import TextInput from "../components/TextInput";
+import PrimaryButton from "../components/PrimaryButton";
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
@@ -92,21 +93,22 @@ export const RegisterPage = () => {
   required
 />
 
-       <TextInput
+     <TextInput
   type="password"
   placeholder="Potvrda lozinke"
   value={passwordConfirm}
   onChange={(e) => setPasswordConfirm(e.target.value)}
-  showPasswordToggle={true}
+  showPasswordToggle
   required
 />
-
         {info && <div className="auth-alert auth-alert-info">{info}</div>}
         {error && <div className="auth-alert auth-alert-error">{error}</div>}
 
-        <button disabled={loading}>
-          {loading ? "Registracija..." : "Registruj se"}
-        </button>
+       <PrimaryButton type="submit" loading={loading} loadingText="Registracija...">
+  Registruj se
+</PrimaryButton>
+
+
       </form>
     </div>
   );
