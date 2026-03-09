@@ -12,11 +12,25 @@ class EventParticipationController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    private function canAccess(EventParticipation $p): bool
+{
+    $role = strtoupper(trim(auth()->user()->role));
+    return in_array($role, ['ORGANIZATOR', 'ADMIN'], true) || $p->idUser === auth()->id();
+}
     public function index()
-    {
-        //
-        return EventParticipation::all();
+{
+    $user = auth()->user();
+    $role = strtoupper(trim($user->role));
+
+    $q = EventParticipation::query();
+
+    if (!in_array($role, ['ORGANIZATOR', 'ADMIN'], true)) {
+        $q->where('idUser', $user->id);
     }
+
+    return response()->json($q->get());
+}
 
     /**
      * Show the form for creating a new resource.
@@ -29,49 +43,51 @@ class EventParticipationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-        $validator = Validator::make($request->all(), [
-    'idEvent' => [
-        'required',
-        'integer',
-        'exists:events,idEvent',
-        // pravilo jedinstvene kombinacije sa idUser
-        Rule::unique('event_participations')->where(function ($query) use ($request) {
-            return $query->where('idUser', $request->idUser);
-        }),
-    ],
-    'idUser' => 'required|integer|exists:users,id',
-    'status' => 'required|string|in:REGISTERED,CANCELLED,ATTENDED',
-    'registeredAt' => 'required|date',
-    'cancelledAt' => 'nullable|date',
-    'attendanceMarkedAt' => 'nullable|date',
-]);
+   public function store(Request $request)
+{
+    $userId = auth()->id();
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validacija nije prošla',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+    $validator = Validator::make($request->all(), [
+        'idEvent' => [
+            'required',
+            'integer',
+            'exists:events,idEvent',
+            Rule::unique('event_participations')->where(fn ($q) => $q->where('idUser', $userId)),
+        ],
+        'status' => 'required|string|in:REGISTERED,CANCELLED,ATTENDED',
+        'registeredAt' => 'required|date',
+        'cancelledAt' => 'nullable|date',
+        'attendanceMarkedAt' => 'nullable|date',
+    ]);
 
-        $data = $validator->validated();
-        $eventParticipation = EventParticipation::create($data);
+    if ($validator->fails()) {
         return response()->json([
-            $eventParticipation
-        ], 201);
-
+            'message' => 'Validacija nije prošla',
+            'errors' => $validator->errors()
+        ], 422);
     }
+
+    $data = $validator->validated();
+    $data['idUser'] = $userId;
+
+    $eventParticipation = EventParticipation::create($data);
+
+    return response()->json($eventParticipation, 201);
+}
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
-    {
-        //
-        return EventParticipation::where('idParticipation', $id)->firstOrFail();
+   public function show($id)
+{
+    $p = EventParticipation::where('idParticipation', $id)->firstOrFail();
+
+    if (!$this->canAccess($p)) {
+        return response()->json(['message' => 'Forbidden'], 403);
     }
+
+    return response()->json($p);
+}
 
     /**
      * Show the form for editing the specified resource.
@@ -84,66 +100,54 @@ class EventParticipationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
-        //
-            $eventParticipation = EventParticipation::where('idParticipation', $id)->firstOrFail();
-        if (!$eventParticipation) {
-            return response()->json([   
-                'message' => 'Učestvovanje nije pronađeno'
-            ], 404);    
+   public function update(Request $request, $id)
+{
+    $p = EventParticipation::where('idParticipation', $id)->firstOrFail();
 
-        
+    if (!$this->canAccess($p)) {
+        return response()->json(['message' => 'Forbidden'], 403);
     }
-        $validator = Validator::make($request->all(), [
-            'idEvent' => [
-                'sometimes',
-                'required',
-                'integer',
-                'exists:events,idEvent',
-                // pravilo jedinstvene kombinacije sa idUser
-                Rule::unique('event_participations')->where(function ($query) use ($request, $id) {
-                    return $query->where('idUser', $request->idUser)
-                                 ->where('idParticipation', '!=', $id);
-                }),
-            ],
-            'idUser' => 'sometimes|required|integer|exists:users,id',
-            'status' => 'sometimes|required|string|in:REGISTERED,CANCELLED,ATTENDED',
-            'registeredAt' => 'sometimes|required|date',
-            'cancelledAt' => 'nullable|date',
-            'attendanceMarkedAt' => 'nullable|date',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validacija nije prošla',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+    // ne dozvoli menjanje idUser kroz update
+    $validator = Validator::make($request->all(), [
+        'idEvent' => [
+            'sometimes','required','integer','exists:events,idEvent',
+            Rule::unique('event_participations')->where(fn ($q) => $q
+                ->where('idUser', $p->idUser)
+                ->where('idParticipation', '!=', $id)
+            ),
+        ],
+        'status' => 'sometimes|required|string|in:REGISTERED,CANCELLED,ATTENDED',
+        'registeredAt' => 'sometimes|required|date',
+        'cancelledAt' => 'nullable|date',
+        'attendanceMarkedAt' => 'nullable|date',
+    ]);
 
-        $data = $validator->validated();
-        $eventParticipation->update($data);
+    if ($validator->fails()) {
         return response()->json([
-            $eventParticipation
-        ], 200);
-
-
+            'message' => 'Validacija nije prošla',
+            'errors' => $validator->errors()
+        ], 422);
     }
+
+    $p->update($validator->validated());
+
+    return response()->json($p, 200);
+}
+
 
     
     public function destroy($id)
-    {
-        //
-        $eventParticipation = EventParticipation::where('idParticipation', $id)->first();
-        if(!$eventParticipation){
-            return response()->json([
-                'message' => 'Učestvovanje nije pronađeno'
-            ], 404);
-        }
-        $eventParticipation->delete();
-        return response()->json([
-            'message' => 'Učestvovanje je obrisano'
-        ], 200);
+{
+    $p = EventParticipation::where('idParticipation', $id)->firstOrFail();
+
+    if (!$this->canAccess($p)) {
+        return response()->json(['message' => 'Forbidden'], 403);
     }
+
+    $p->delete();
+
+    return response()->json(['message' => 'Učestvovanje je obrisano'], 200);
+}
 }
 

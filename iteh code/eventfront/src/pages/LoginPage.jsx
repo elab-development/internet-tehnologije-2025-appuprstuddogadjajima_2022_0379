@@ -35,7 +35,10 @@ console.log("LS TOKEN:", localStorage.getItem("token"));
 
 
 
-
+console.log("STATUS:", res.status);
+console.log("DATA:", res.data);
+console.log("TOKEN:", token);
+console.log("USER:", user);
       navigate("/events");
 
 
@@ -50,19 +53,17 @@ console.log("LS TOKEN:", localStorage.getItem("token"));
 
     
     }catch(err){
-      setLoading(false);
+   setLoading(false);
+  console.log("LOGIN ERROR:", err);
+  console.log("RESPONSE:", err.response);
 
-      console.log(err);
-
-      if(err.response.status === 401){
-        setError("Neispravna email adresa ili lozinka");
-      }else if(err.response.status === 422){
-        setError("Nedostaju potrebni podaci za prijavu");
-      }else{
-        setError("Došlo je do greške prilikom prijave. Pokušajte ponovo.");
-      }
-
-
+  if(err.response?.status === 401){
+    setError("Neispravna email adresa ili lozinka");
+  }else if(err.response?.status === 422){
+    setError("Nedostaju potrebni podaci za prijavu");
+  }else{
+    setError("Došlo je do greške prilikom prijave. Pokušajte ponovo.");
+  }
 
     }
 

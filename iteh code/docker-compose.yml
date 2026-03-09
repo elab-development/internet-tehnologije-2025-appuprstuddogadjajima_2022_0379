@@ -1,0 +1,58 @@
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: eventovi
+      MYSQL_USER: eventhub
+      MYSQL_PASSWORD: eventhubpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  backend:
+    build:
+      context: ./eventapi
+      dockerfile: Dockerfile
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: eventovi
+      DB_USERNAME: eventhub
+      DB_PASSWORD: eventhubpass
+      APP_URL: http://localhost:8000/
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./eventapi:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./eventfront
+      dockerfile: Dockerfile
+    environment:
+      REACT_APP_API_URL: http://localhost:8000/api
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./eventfront:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    command: ["npm", "start"]
+
+volumes:
+  db_data:
