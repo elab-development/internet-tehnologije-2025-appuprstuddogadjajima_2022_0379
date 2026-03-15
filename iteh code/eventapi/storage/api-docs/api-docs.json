@@ -1,0 +1,1129 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "EventHub API",
+        "description": "API dokumentacija za EventHub aplikaciju",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registracija korisnika",
+                "operationId": "278f3b96a2ff88d120714549e2113f4d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "firstName",
+                                    "lastName",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "firstName": {
+                                        "type": "string",
+                                        "example": "Stefan"
+                                    },
+                                    "lastName": {
+                                        "type": "string",
+                                        "example": "Malbasa"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "stefan@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Uspešna registracija"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://localhost:8000",
+                        "description": "Local server"
+                    }
+                ]
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Prijava korisnika",
+                "operationId": "c6e01b33023a9a4b02f91c4fc666fe34",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "stefan@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Uspešna prijava"
+                    },
+                    "401": {
+                        "description": "Neispravni kredencijali"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://localhost:8000",
+                        "description": "Local server"
+                    }
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Odjava korisnika",
+                "operationId": "0a5c63b873b73047b8636bae7a0a2fcc",
+                "responses": {
+                    "200": {
+                        "description": "Uspešna odjava"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://localhost:8000",
+                        "description": "Local server"
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Podaci o trenutno ulogovanom korisniku",
+                "operationId": "2c13fd98adec6f071980de5a39d14f49",
+                "responses": {
+                    "200": {
+                        "description": "Podaci o korisniku"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://localhost:8000",
+                        "description": "Local server"
+                    }
+                ]
+            }
+        },
+        "/api/categories": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Prikaz svih kategorija",
+                "operationId": "5334779003e44eba3d2ed0af49466c35",
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćena lista kategorija"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Kreiranje nove kategorije",
+                "operationId": "35b7c7c4ff6b6d0eaa747a2c5688a517",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Konferencije"
+                                    },
+                                    "opis": {
+                                        "type": "string",
+                                        "example": "Događaji tipa konferencija"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Kategorija uspešno kreirana"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Prikaz jedne kategorije",
+                "operationId": "210ea397cf587928bc8458be518de086",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kategorije (idCategory)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćena kategorija"
+                    },
+                    "404": {
+                        "description": "Kategorija nije pronađena"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Izmena postojeće kategorije",
+                "operationId": "d4cd2fd7bf8555bcbb42ac55fa3b6f98",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kategorije (idCategory)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Ažurirane konferencije"
+                                    },
+                                    "opis": {
+                                        "type": "string",
+                                        "example": "Ažurirani opis kategorije"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kategorija uspešno izmenjena"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Kategorija nije pronađena"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Brisanje kategorije",
+                "operationId": "a77a46a20b44d8426a957fc28cc1e2ae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kategorije (idCategory)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kategorija uspešno obrisana"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Kategorija nije pronađena"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/events": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Prikaz svih događaja",
+                "operationId": "d43c1c5feaaac0255817e90aa7ea15a4",
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćena lista događaja"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Kreiranje novog događaja",
+                "operationId": "e11d6ea982e5d3b911dd537cb0adddf0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "idUser",
+                                    "idCategory",
+                                    "title",
+                                    "description",
+                                    "location",
+                                    "startAt",
+                                    "endAt",
+                                    "capacity",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "idUser": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "idCategory": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "IT Konferencija 2026"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Velika studentska konferencija iz oblasti informacionih tehnologija."
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Beograd"
+                                    },
+                                    "startAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-04-15 18:00:00"
+                                    },
+                                    "endAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-04-15 21:00:00"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 150
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "AKTIVAN"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Događaj uspešno kreiran"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/events/{id}": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Prikaz jednog događaja",
+                "operationId": "fdfd15b2df2fce775406c3e831818021",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID događaja (idEvent)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćen događaj"
+                    },
+                    "404": {
+                        "description": "Događaj nije pronađen"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Izmena postojećeg događaja",
+                "operationId": "7a5b7735125aae2414c29bb2d202bd8d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID događaja (idEvent)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "idUser": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "idCategory": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Izmenjena IT Konferencija 2026"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Ažuriran opis događaja."
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Novi Sad"
+                                    },
+                                    "startAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-04-20 19:00:00"
+                                    },
+                                    "endAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-04-20 22:00:00"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 200
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "AKTIVAN"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Događaj uspešno izmenjen"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Događaj nije pronađen"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Brisanje događaja",
+                "operationId": "5305f84163f3901768e5befe4f422246",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID događaja (idEvent)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Događaj uspešno obrisan"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Događaj nije pronađen"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/event-participations": {
+            "get": {
+                "tags": [
+                    "Event Participations"
+                ],
+                "summary": "Prikaz učestvovanja na događajima",
+                "description": "ADMIN/ORGANIZATOR vide sva učestvovanja, ostali vide samo svoja.",
+                "operationId": "e43d6defa40dfa4b073ec722217c82fb",
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćena lista učestvovanja"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Event Participations"
+                ],
+                "summary": "Prijava korisnika na događaj",
+                "operationId": "81e6d907ee00f4b0cc05338a53eb87d4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "idEvent",
+                                    "status",
+                                    "registeredAt"
+                                ],
+                                "properties": {
+                                    "idEvent": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "REGISTERED"
+                                    },
+                                    "registeredAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-04-10 12:00:00"
+                                    },
+                                    "cancelledAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "attendanceMarkedAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Učestvovanje uspešno kreirano"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "422": {
+                        "description": "Greška validacije ili korisnik već prijavljen na događaj"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/event-participations/{id}": {
+            "get": {
+                "tags": [
+                    "Event Participations"
+                ],
+                "summary": "Prikaz jednog učestvovanja na događaju",
+                "operationId": "6fae780a579a77c797876a600218d322",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID učestvovanja (idParticipation)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćeno učestvovanje"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Učestvovanje nije pronađeno"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Event Participations"
+                ],
+                "summary": "Izmena učestvovanja na događaju",
+                "operationId": "06001561716a71460b96311a5a3decc5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID učestvovanja (idParticipation)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "idEvent": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "CANCELLED"
+                                    },
+                                    "registeredAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-04-10 12:00:00"
+                                    },
+                                    "cancelledAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    },
+                                    "attendanceMarkedAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Učestvovanje uspešno izmenjeno"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Učestvovanje nije pronađeno"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Event Participations"
+                ],
+                "summary": "Brisanje učestvovanja na događaju",
+                "operationId": "b22c550d09e28c1895cf23378004e28b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID učestvovanja (idParticipation)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Učestvovanje uspešno obrisano"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Učestvovanje nije pronađeno"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Prikaz svih notifikacija ulogovanog korisnika",
+                "operationId": "afdfd7d2bbf2fcdaf5b8c1e1e07e4eec",
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćena lista notifikacija"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Kreiranje nove notifikacije",
+                "operationId": "c1bc4a871653ba54a228c6fbf695580a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "idEvent",
+                                    "message",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "idEvent": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Podsetnik: događaj počinje sutra u 18h"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "REMINDER"
+                                    },
+                                    "seen": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notifikacija uspešno kreirana"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/{id}": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Prikaz jedne notifikacije",
+                "operationId": "80f8f96dbc2dcd82aae78323704e90bc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID notifikacije (idNotification)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uspešno vraćena notifikacija"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Notifikacija nije pronađena"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Izmena postojeće notifikacije",
+                "operationId": "dd3c70b57d876ff46a96ec571f60962c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID notifikacije (idNotification)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "idEvent": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Ažurirana poruka notifikacije"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "UPDATE"
+                                    },
+                                    "seen": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notifikacija uspešno izmenjena"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Notifikacija nije pronađena"
+                    },
+                    "422": {
+                        "description": "Greška validacije"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Brisanje notifikacije",
+                "operationId": "731ec9a91c011379af0c8c0af66bcfe4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID notifikacije (idNotification)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notifikacija uspešno obrisana"
+                    },
+                    "401": {
+                        "description": "Neautorizovan pristup"
+                    },
+                    "403": {
+                        "description": "Zabranjen pristup"
+                    },
+                    "404": {
+                        "description": "Notifikacija nije pronađena"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Categories",
+            "description": "Rute za upravljanje kategorijama"
+        },
+        {
+            "name": "Events",
+            "description": "Rute za upravljanje događajima"
+        },
+        {
+            "name": "Event Participations",
+            "description": "Rute za učestvovanja korisnika na događajima"
+        },
+        {
+            "name": "Notifications",
+            "description": "Rute za notifikacije ulogovanog korisnika"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        }
+    ]
+}

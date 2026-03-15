@@ -6,31 +6,66 @@ use App\Models\EventParticipation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use OpenApi\Annotations as OA;
 
 class EventParticipationController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Schema(
+     *     schema="EventParticipation",
+     *     type="object",
+     *     @OA\Property(property="idParticipation", type="integer", example=1),
+     *     @OA\Property(property="idUser", type="integer", example=3),
+     *     @OA\Property(property="idEvent", type="integer", example=5),
+     *     @OA\Property(property="status", type="string", example="REGISTERED"),
+     *     @OA\Property(property="registeredAt", type="string", format="date-time", example="2026-04-10 12:00:00"),
+     *     @OA\Property(property="cancelledAt", type="string", format="date-time", nullable=true),
+     *     @OA\Property(property="attendanceMarkedAt", type="string", format="date-time", nullable=true),
+     *     @OA\Property(property="created_at", type="string", format="date-time"),
+     *     @OA\Property(property="updated_at", type="string", format="date-time")
+     * )
      */
 
     private function canAccess(EventParticipation $p): bool
-{
-    $role = strtoupper(trim(auth()->user()->role));
-    return in_array($role, ['ORGANIZATOR', 'ADMIN'], true) || $p->idUser === auth()->id();
-}
-    public function index()
-{
-    $user = auth()->user();
-    $role = strtoupper(trim($user->role));
-
-    $q = EventParticipation::query();
-
-    if (!in_array($role, ['ORGANIZATOR', 'ADMIN'], true)) {
-        $q->where('idUser', $user->id);
+    {
+        $role = strtoupper(trim(auth()->user()->role));
+        return in_array($role, ['ORGANIZATOR', 'ADMIN'], true) || $p->idUser === auth()->id();
     }
 
-    return response()->json($q->get());
-}
+    /**
+     * @OA\Get(
+     *     path="/api/event-participations",
+     *     summary="Prikaz učestvovanja na događajima",
+     *     description="ADMIN/ORGANIZATOR vide sva učestvovanja, ostali vide samo svoja.",
+     *     tags={"Event Participations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Uspešno vraćena lista učestvovanja",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/EventParticipation")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     )
+     * )
+     */
+    public function index()
+    {
+        $user = auth()->user();
+        $role = strtoupper(trim($user->role));
+
+        $q = EventParticipation::query();
+
+        if (!in_array($role, ['ORGANIZATOR', 'ADMIN'], true)) {
+            $q->where('idUser', $user->id);
+        }
+
+        return response()->json($q->get());
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -42,6 +77,37 @@ class EventParticipationController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @OA\Post(
+     *     path="/api/event-participations",
+     *     summary="Prijava korisnika na događaj",
+     *     tags={"Event Participations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"idEvent","status","registeredAt"},
+     *             @OA\Property(property="idEvent", type="integer", example=5),
+     *             @OA\Property(property="status", type="string", example="REGISTERED"),
+     *             @OA\Property(property="registeredAt", type="string", format="date-time", example="2026-04-10 12:00:00"),
+     *             @OA\Property(property="cancelledAt", type="string", format="date-time", nullable=true),
+     *             @OA\Property(property="attendanceMarkedAt", type="string", format="date-time", nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Učestvovanje uspešno kreirano",
+     *         @OA\JsonContent(ref="#/components/schemas/EventParticipation")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Greška validacije ili korisnik već prijavljen na događaj"
+     *     )
+     * )
      */
    public function store(Request $request)
 {
@@ -77,6 +143,37 @@ class EventParticipationController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @OA\Get(
+     *     path="/api/event-participations/{id}",
+     *     summary="Prikaz jednog učestvovanja na događaju",
+     *     tags={"Event Participations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID učestvovanja (idParticipation)",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Uspešno vraćeno učestvovanje",
+     *         @OA\JsonContent(ref="#/components/schemas/EventParticipation")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Zabranjen pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Učestvovanje nije pronađeno"
+     *     )
+     * )
      */
    public function show($id)
 {
@@ -99,6 +196,51 @@ class EventParticipationController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @OA\Put(
+     *     path="/api/event-participations/{id}",
+     *     summary="Izmena učestvovanja na događaju",
+     *     tags={"Event Participations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID učestvovanja (idParticipation)",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="idEvent", type="integer", example=5),
+     *             @OA\Property(property="status", type="string", example="CANCELLED"),
+     *             @OA\Property(property="registeredAt", type="string", format="date-time", example="2026-04-10 12:00:00"),
+     *             @OA\Property(property="cancelledAt", type="string", format="date-time", nullable=true),
+     *             @OA\Property(property="attendanceMarkedAt", type="string", format="date-time", nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Učestvovanje uspešno izmenjeno",
+     *         @OA\JsonContent(ref="#/components/schemas/EventParticipation")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Zabranjen pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Učestvovanje nije pronađeno"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Greška validacije"
+     *     )
+     * )
      */
    public function update(Request $request, $id)
 {
@@ -136,7 +278,37 @@ class EventParticipationController extends Controller
 }
 
 
-    
+    /**
+     * @OA\Delete(
+     *     path="/api/event-participations/{id}",
+     *     summary="Brisanje učestvovanja na događaju",
+     *     tags={"Event Participations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID učestvovanja (idParticipation)",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Učestvovanje uspešno obrisano"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Zabranjen pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Učestvovanje nije pronađeno"
+     *     )
+     * )
+     */
     public function destroy($id)
 {
     $p = EventParticipation::where('idParticipation', $id)->firstOrFail();

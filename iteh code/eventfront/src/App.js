@@ -20,8 +20,10 @@ function App() {
       <BrowserRouter>
       <Navbar>  </Navbar>
         <Routes>
-           <Route path="/events" element={<Events />} />
           <Route path="/" element={<Pocetna />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/events/create" element={<CreateEvent />} />
+          <Route path="/events/:id" element={<EventDetails />} />
           <Route
   path="/login"
   element={

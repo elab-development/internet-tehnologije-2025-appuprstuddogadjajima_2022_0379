@@ -20,12 +20,19 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [categories, setCategories] = useState([]);
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("ALL");
   const [category, setCategory] = useState("ALL");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+
+  const rawUser = localStorage.getItem("user");
+  const user = rawUser ? JSON.parse(rawUser) : null;
+  const role = String(user?.role || "").toUpperCase();
+  const canCreate =
+    role === "ORGANIZATOR" || role === "ADMIN" || role === "ADMINISTRATOR";
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -62,12 +69,53 @@ export default function EventsPage() {
   }, []);
 
   const categoryOptions = useMemo(() => {
-    const set = new Set();
-    events.forEach((ev) => {
-      if (ev?.idCategory != null) set.add(String(ev.idCategory));
+    const map = new Map();
+    categories.forEach((c) => {
+      const id = c.idCategory ?? c.id;
+      if (id != null) {
+        const key = String(id);
+        const label = c.name ?? `Kategorija ${id}`;
+        map.set(key, label);
+      }
     });
-    return Array.from(set).sort((a, b) => Number(a) - Number(b));
-  }, [events]);
+    return Array.from(map.entries()).sort(
+      ([aId], [bId]) => Number(aId) - Number(bId)
+    );
+  }, [categories]);
+
+  const categoryLabelById = useMemo(() => {
+    const m = new Map();
+    categoryOptions.forEach(([value, label]) => {
+      m.set(value, label);
+    });
+    return m;
+  }, [categoryOptions]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${API_BASE}/api/categories`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+
+        if (!res.ok) {
+          return;
+        }
+
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : data?.data ?? [];
+        setCategories(list);
+      } catch {
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -112,9 +160,11 @@ export default function EventsPage() {
           <p>Pregled aktuelnih događaja, pretraga i filtriranje.</p>
         </div>
 
-        <Link className="btn btn-primary" to="/events/create">
-          + Novi događaj
-        </Link>
+        {canCreate && (
+          <Link className="btn btn-primary" to="/events/create">
+            + Novi događaj
+          </Link>
+        )}
       </div>
 
       <div className="filters-card">
@@ -139,15 +189,15 @@ export default function EventsPage() {
           </div>
 
           <div className="field">
-            <label>Kategorija (id)</label>
+            <label>Kategorija</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="ALL">Sve</option>
-              {categoryOptions.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+              {categoryOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
                 </option>
               ))}
             </select>
@@ -240,7 +290,11 @@ export default function EventsPage() {
                       </div>
                       <div>
                         <span className="k">Kategorija:</span>{" "}
-                        <span className="v">{ev.idCategory ?? "-"}</span>
+                        <span className="v">
+                          {categoryLabelById.get(String(ev.idCategory ?? "")) ??
+                            ev.idCategory ??
+                            "-"}
+                        </span>
                       </div>
                     </div>
 
@@ -250,13 +304,6 @@ export default function EventsPage() {
                         to={`/events/${id}`}
                       >
                         Detalji
-                      </Link>
-
-                      <Link
-                        className="btn btn-ghost"
-                        to={`/events/${id}/edit`}
-                      >
-                        Izmeni
                       </Link>
                     </div>
                   </div>

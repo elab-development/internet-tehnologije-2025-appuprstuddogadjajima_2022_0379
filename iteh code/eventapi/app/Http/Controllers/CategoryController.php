@@ -6,11 +6,20 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\CategoryResource;
+use OpenApi\Annotations as OA;
 
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Schema(
+     *     schema="Category",
+     *     type="object",
+     *     @OA\Property(property="idCategory", type="integer", example=1),
+     *     @OA\Property(property="name", type="string", example="Konferencije"),
+     *     @OA\Property(property="opis", type="string", example="Događaji tipa konferencija"),
+     *     @OA\Property(property="created_at", type="string", format="date-time"),
+     *     @OA\Property(property="updated_at", type="string", format="date-time")
+     * )
      */
 
     // This method will return a list of all categories in the database.
@@ -19,12 +28,24 @@ class CategoryController extends Controller
     // GET metoda za dohvatanje svih kategorija
 
     // vraca sve kategorije iz baze podataka i vraca ih kao JSON odgovor SVE!!!
+    /**
+     * @OA\Get(
+     *     path="/api/categories",
+     *     summary="Prikaz svih kategorija",
+     *     tags={"Categories"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Uspešno vraćena lista kategorija",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Category")
+     *         )
+     *     )
+     * )
+     */
     public function index()
     {
-        //
-       // return Category::all();
-    return Category::all();
-
+        return Category::all();
     }
 
     /**
@@ -37,6 +58,38 @@ class CategoryController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @OA\Post(
+     *     path="/api/categories",
+     *     summary="Kreiranje nove kategorije",
+     *     tags={"Categories"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Konferencije"),
+     *             @OA\Property(property="opis", type="string", example="Događaji tipa konferencija")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Kategorija uspešno kreirana",
+     *         @OA\JsonContent(ref="#/components/schemas/Category")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Zabranjen pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Greška validacije"
+     *     )
+     * )
      */
     // This method will handle the creation of a new category. It expects a Request object that contains the data for the new category.
     // The method will validate the incoming request data to ensure that it meets the required criteria (e.g., name is required and must be a string).
@@ -68,6 +121,28 @@ class CategoryController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @OA\Get(
+     *     path="/api/categories/{id}",
+     *     summary="Prikaz jedne kategorije",
+     *     tags={"Categories"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID kategorije (idCategory)",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Uspešno vraćena kategorija",
+     *         @OA\JsonContent(ref="#/components/schemas/Category")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kategorija nije pronađena"
+     *     )
+     * )
      */
 
     // This method will display a specific category based on the provided Category model instance. It will return a JSON response with the category data and a status code of 200 (OK).
@@ -90,6 +165,48 @@ class CategoryController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @OA\Put(
+     *     path="/api/categories/{id}",
+     *     summary="Izmena postojeće kategorije",
+     *     tags={"Categories"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID kategorije (idCategory)",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="Ažurirane konferencije"),
+     *             @OA\Property(property="opis", type="string", example="Ažurirani opis kategorije")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kategorija uspešno izmenjena",
+     *         @OA\JsonContent(ref="#/components/schemas/Category")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Zabranjen pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kategorija nije pronađena"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Greška validacije"
+     *     )
+     * )
      */
     // This method will handle the updating of an existing category. It expects a Request object that contains the updated data for the category and a Category model instance that represents the category to be updated.
     // The method will validate the incoming request data to ensure that it meets the required criteria (
@@ -131,6 +248,36 @@ class CategoryController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @OA\Delete(
+     *     path="/api/categories/{id}",
+     *     summary="Brisanje kategorije",
+     *     tags={"Categories"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID kategorije (idCategory)",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kategorija uspešno obrisana"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Neautorizovan pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Zabranjen pristup"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kategorija nije pronađena"
+     *     )
+     * )
      */
         // This method will handle the deletion of a category. It expects a Category model instance that represents the category to be deleted.
     // The method will delete the category record from the database using the Category model and return a JSON response with a message indicating that the category has been deleted and a status code of 200 (OK). If the deletion fails (e.g., due to database constraints), it will return a JSON response with an error message and a status code of 500 (Internal Server Error).
