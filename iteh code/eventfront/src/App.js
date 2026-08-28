@@ -9,6 +9,7 @@ import Pocetna from './pages/Pocetna';
 import { LoginPage } from './pages/LoginPage';
 import Navbar from './components/Navbar';
 import Events from './pages/Events';
+import CalendarPage from './pages/Calendar';
 import EventDetails from './pages/EventDetails';
 import CreateEvent from './pages/CreateEvent';
 import Footer from './components/Footer';
@@ -22,7 +23,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Pocetna />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/events/create" element={<CreateEvent />} />
+          <Route path="/events/:id/edit" element={<CreateEvent />} />
           <Route path="/events/:id" element={<EventDetails />} />
           <Route
   path="/login"

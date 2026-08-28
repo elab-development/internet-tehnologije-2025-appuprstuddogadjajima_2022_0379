@@ -41,7 +41,8 @@ const Pocetna = () => {
 
       
       <div className="pocetna-actions">
-       
+        <Link className="pocetna-btn" to="/events">Događaji</Link>
+        <Link className="pocetna-btn primary" to="/calendar">Kalendar</Link>
       </div>
 
       

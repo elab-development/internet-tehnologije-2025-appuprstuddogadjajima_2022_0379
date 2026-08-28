@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/api";
 import "./CreateEvent.css";
 
+function toDatetimeLocal(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function CreateEvent() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = Boolean(id);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -48,7 +58,31 @@ export default function CreateEvent() {
     };
 
     fetchCategories();
-  }, [navigate]);
+
+    if (!isEdit) {
+      return;
+    }
+
+    const fetchEvent = async () => {
+      try {
+        const res = await api.get(`/events/${id}`);
+        const ev = Array.isArray(res.data) ? res.data[0] : res.data;
+        setTitle(ev.title ?? "");
+        setDescription(ev.description ?? "");
+        setLocation(ev.location ?? "");
+        setStartAt(toDatetimeLocal(ev.startAt));
+        setEndAt(toDatetimeLocal(ev.endAt));
+        setCapacity(ev.capacity != null ? String(ev.capacity) : "");
+        setIdCategory(ev.idCategory != null ? String(ev.idCategory) : "");
+        setStatus(ev.status ?? "ACTIVE");
+      } catch (e) {
+        console.error("Greška pri učitavanju događaja:", e);
+        setError("Događaj nije pronađen ili nemate pristup.");
+      }
+    };
+
+    fetchEvent();
+  }, [navigate, id, isEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,13 +110,15 @@ export default function CreateEvent() {
         status,
       };
 
-      const res = await api.post("/events", payload);
-      const created = Array.isArray(res.data) ? res.data[0] : res.data;
+      const res = isEdit
+        ? await api.put(`/events/${id}`, payload)
+        : await api.post("/events", payload);
+      const saved = Array.isArray(res.data) ? res.data[0] : res.data;
 
-      const id = created?.idEvent ?? created?.id ?? null;
+      const eventId = saved?.idEvent ?? saved?.id ?? id ?? null;
 
-      if (id != null) {
-        navigate(`/events/${id}`);
+      if (eventId != null) {
+        navigate(`/events/${eventId}`);
       } else {
         navigate("/events");
       }
@@ -93,9 +129,17 @@ export default function CreateEvent() {
       if (resp?.status === 422 && resp.data?.errors) {
         setFieldErrors(resp.data.errors);
       } else if (resp?.status === 401 || resp?.status === 403) {
-        setError("Nemate dozvolu da kreirate događaj.");
+        setError(
+          isEdit
+            ? "Nemate dozvolu da izmenite događaj."
+            : "Nemate dozvolu da kreirate događaj."
+        );
       } else {
-        setError("Došlo je do greške prilikom kreiranja događaja.");
+        setError(
+          isEdit
+            ? "Došlo je do greške prilikom izmene događaja."
+            : "Došlo je do greške prilikom kreiranja događaja."
+        );
       }
     } finally {
       setLoading(false);
@@ -116,9 +160,11 @@ export default function CreateEvent() {
   return (
     <div className="create-event-page">
       <div className="create-event-card">
-        <h1>Kreiranje događaja</h1>
+        <h1>{isEdit ? "Izmena događaja" : "Kreiranje događaja"}</h1>
         <p className="subtitle">
-          Popuni formu kako bi kreirao novi događaj. Polja označena zvezdicom su obavezna.
+          {isEdit
+            ? "Ažuriraj podatke događaja. Polja označena zvezdicom su obavezna."
+            : "Popuni formu kako bi kreirao novi događaj. Polja označena zvezdicom su obavezna."}
         </p>
 
         {error && <div className="global-error">{error}</div>}
@@ -239,13 +285,13 @@ export default function CreateEvent() {
             <button
               type="button"
               className="btn btn-ghost"
-              onClick={() => navigate("/events")}
+              onClick={() => navigate(isEdit ? `/events/${id}` : "/events")}
               disabled={loading}
             >
               Otkaži
             </button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? "Čuvanje..." : "Sačuvaj događaj"}
+              {loading ? "Čuvanje..." : isEdit ? "Sačuvaj izmene" : "Sačuvaj događaj"}
             </button>
           </div>
         </form>

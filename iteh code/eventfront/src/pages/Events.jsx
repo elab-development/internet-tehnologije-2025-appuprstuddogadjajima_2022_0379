@@ -160,11 +160,16 @@ export default function EventsPage() {
           <p>Pregled aktuelnih događaja, pretraga i filtriranje.</p>
         </div>
 
-        {canCreate && (
-          <Link className="btn btn-primary" to="/events/create">
-            + Novi događaj
+        <div className="header-actions">
+          <Link className="btn btn-ghost" to="/calendar">
+            Kalendar
           </Link>
-        )}
+          {canCreate && (
+            <Link className="btn btn-primary" to="/events/create">
+              + Novi događaj
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="filters-card">
@@ -286,7 +291,11 @@ export default function EventsPage() {
                       </div>
                       <div>
                         <span className="k">Kapacitet:</span>{" "}
-                        <span className="v">{ev.capacity ?? "-"}</span>
+                        <span className="v">
+                          {ev.registeredCount != null && ev.capacity != null
+                            ? `${ev.registeredCount} / ${ev.capacity}`
+                            : (ev.capacity ?? "-")}
+                        </span>
                       </div>
                       <div>
                         <span className="k">Kategorija:</span>{" "}

@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import "./Navbar.css";
 import PrimaryButton from './PrimaryButton';
@@ -36,7 +36,9 @@ const Navbar = () => {
 
   return (
   <div className="navbar">
-    <Link to="/" className="nav-link">Početna</Link>
+    <NavLink to="/" end className="nav-link">Početna</NavLink>
+    <NavLink to="/events" className="nav-link">Događaji</NavLink>
+    <NavLink to="/calendar" className="nav-link">Kalendar</NavLink>
 
     {!isAuth && (
       <>
@@ -46,13 +48,9 @@ const Navbar = () => {
     )}
 
     {isAuth && (
-      <>
-      <Link to="/events" className="nav-link">Moji eventovi</Link>
      <button className="nav-link logout-btn" onClick={handleLogout} type="button">
   Odjavi se
 </button>
-    
-      </>
     )}
   </div>
 );

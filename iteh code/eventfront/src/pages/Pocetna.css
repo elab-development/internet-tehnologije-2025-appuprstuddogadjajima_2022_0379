@@ -23,6 +23,31 @@
   line-height: 1.6;
 }
 
+.pocetna-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.pocetna-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid #cbd5e1;
+  color: #0b1220;
+  background: #ffffff;
+}
+
+.pocetna-btn.primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
 .features {
   margin-top: 60px;
   display: grid;

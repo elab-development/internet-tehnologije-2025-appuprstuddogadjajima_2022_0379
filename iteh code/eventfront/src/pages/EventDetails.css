@@ -9,7 +9,7 @@
 
  .event-details-card{
    width: 100%;
-   max-width: 780px;
+   max-width: 860px;
    background: #ffffff;
    border: 1px solid #e2e8f0;
    border-radius: 14px;
@@ -61,6 +61,7 @@
  .actions{
    display: flex;
    justify-content: flex-end;
+   flex-wrap: wrap;
    gap: 10px;
  }
 
@@ -77,13 +78,46 @@
    user-select: none;
  }
 
+ .btn:disabled{
+   opacity: 0.65;
+   cursor: default;
+ }
+
+ .btn-primary{
+   background: #3b82f6;
+   color: #ffffff;
+ }
+
+ .btn-primary:hover:not(:disabled){
+   background: #2563eb;
+ }
+
  .btn-secondary{
    background: #0b1220;
    color: #ffffff;
  }
 
- .btn-secondary:hover{
+ .btn-secondary:hover:not(:disabled){
    filter: brightness(1.1);
+ }
+
+ .btn-ghost{
+   background: transparent;
+   border-color: #cbd5e1;
+   color: #0b1220;
+ }
+
+ .btn-ghost:hover:not(:disabled){
+   background: #f1f5f9;
+ }
+
+ .btn-danger{
+   background: #dc2626;
+   color: #ffffff;
+ }
+
+ .btn-danger:hover:not(:disabled){
+   background: #b91c1c;
  }
 
  .error{
@@ -94,5 +128,86 @@
    border: 1px solid rgba(239, 68, 68, 0.35);
    color: #7f1d1d;
    font-size: 14px;
+ }
+
+ .success{
+   margin: 0 0 14px 0;
+   padding: 10px 12px;
+   border-radius: 10px;
+   background: rgba(34, 197, 94, 0.1);
+   border: 1px solid rgba(34, 197, 94, 0.35);
+   color: #14532d;
+   font-size: 14px;
+ }
+
+ .status.active{
+   background: rgba(34, 197, 94, 0.12);
+   border-color: rgba(34, 197, 94, 0.25);
+ }
+
+ .status.cancelled{
+   background: rgba(239, 68, 68, 0.12);
+   border-color: rgba(239, 68, 68, 0.25);
+ }
+
+ .participants{
+   margin-top: 22px;
+   padding-top: 18px;
+   border-top: 1px solid #e2e8f0;
+ }
+
+ .participants h2{
+   margin: 0 0 12px 0;
+   font-size: 18px;
+   color: #0b1220;
+ }
+
+ .empty{
+   margin: 0;
+   color: #64748b;
+   font-size: 14px;
+ }
+
+ .participants-table{
+   width: 100%;
+   border-collapse: collapse;
+   font-size: 13px;
+ }
+
+ .participants-table th,
+ .participants-table td{
+   text-align: left;
+   padding: 10px 8px;
+   border-bottom: 1px solid #e2e8f0;
+ }
+
+ .participants-table th{
+   color: #64748b;
+   font-weight: 700;
+ }
+
+ .pill{
+   display: inline-block;
+   padding: 3px 8px;
+   border-radius: 999px;
+   font-size: 11px;
+   font-weight: 800;
+   background: #f1f5f9;
+   border: 1px solid #cbd5e1;
+ }
+
+ .pill.registered{
+   background: rgba(34, 197, 94, 0.12);
+   border-color: rgba(34, 197, 94, 0.25);
+ }
+
+ .pill.cancelled{
+   background: rgba(239, 68, 68, 0.12);
+   border-color: rgba(239, 68, 68, 0.25);
+ }
+
+ .pill.attended{
+   background: rgba(59, 130, 246, 0.12);
+   border-color: rgba(59, 130, 246, 0.25);
  }
 
