@@ -22,17 +22,26 @@ services:
       context: ./eventapi
       dockerfile: Dockerfile
     environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      APP_KEY: base64:2fl+pTnzuFmjmsIes/jZ7PPiAMm5Wj6ZgGY6+X/YQFk=
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
       DB_DATABASE: eventovi
       DB_USERNAME: eventhub
       DB_PASSWORD: eventhubpass
-      APP_URL: http://localhost:8000/
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
     ports:
       - "8000:8000"
     volumes:
       - ./eventapi:/var/www/html
+      - ./eventapi/.env.docker:/var/www/html/.env:ro
+      - backend_vendor:/var/www/html/vendor
     depends_on:
       db:
         condition: service_healthy
@@ -42,17 +51,19 @@ services:
       context: ./eventfront
       dockerfile: Dockerfile
     environment:
-      REACT_APP_API_URL: http://localhost:8000/api
+      HOST: "0.0.0.0"
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
+      DANGEROUSLY_DISABLE_HOST_CHECK: "true"
     ports:
       - "3000:3000"
     volumes:
       - ./eventfront:/app
-      - /app/node_modules
+      - frontend_node_modules:/app/node_modules
     depends_on:
       - backend
-    command: ["npm", "start"]
 
 volumes:
   db_data:
+  backend_vendor:
+  frontend_node_modules:
