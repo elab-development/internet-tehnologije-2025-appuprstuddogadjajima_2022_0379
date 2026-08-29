@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventParticipation;
+use App\Models\Notification;
+use App\NotificationType;
+use App\ParticipationStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -263,6 +267,15 @@ class EventController extends Controller
         $event->update($data);
         $event->refresh();
 
+        $type = (($data['status'] ?? null) === 'CANCELLED')
+            ? NotificationType::CANCELLATION
+            : NotificationType::UPDATE;
+        $message = $type === NotificationType::CANCELLATION
+            ? 'Događaj „'.$event->title.'” je otkazan.'
+            : 'Događaj „'.$event->title.'” je izmenjen.';
+
+        $this->notifyRegisteredParticipants($event, $message, $type);
+
         return response()->json([
             $event,
         ], 200);
@@ -311,10 +324,29 @@ class EventController extends Controller
                 'message' => 'Događaj nije pronađen',
             ], 404);
         }
+
+        $this->notifyRegisteredParticipants(
+            $event,
+            'Događaj „'.$event->title.'” je obrisan.',
+            NotificationType::CANCELLATION
+        );
+
         $event->delete();
 
         return response()->json([
             'message' => 'Događaj je obrisan',
         ], 200);
+    }
+
+    private function notifyRegisteredParticipants(Event $event, string $message, NotificationType $type): void
+    {
+        $userIds = EventParticipation::query()
+            ->where('idEvent', $event->idEvent)
+            ->where('status', ParticipationStatus::REGISTERED)
+            ->pluck('idUser');
+
+        foreach ($userIds as $userId) {
+            Notification::notifyUser((int) $userId, $event->idEvent, $message, $type);
+        }
     }
 }

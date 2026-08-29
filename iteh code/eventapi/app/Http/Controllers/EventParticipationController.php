@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventParticipation;
+use App\Models\Notification;
+use App\NotificationType;
 use App\ParticipationStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -65,9 +67,12 @@ class EventParticipationController extends Controller
         $user = auth()->user();
         $role = strtoupper(trim($user->role));
 
-        $q = EventParticipation::query()->with(['user:id,firstName,lastName,email']);
+        $q = EventParticipation::query()->with([
+            'user:id,firstName,lastName,email',
+            'event:idEvent,title,location,startAt,endAt,status',
+        ]);
 
-        if (! in_array($role, ['ORGANIZATOR', 'ADMIN'], true)) {
+        if ($request->boolean('mine') || ! in_array($role, ['ORGANIZATOR', 'ADMIN'], true)) {
             $q->where('idUser', $user->id);
         }
 
@@ -152,6 +157,7 @@ class EventParticipationController extends Controller
 
         $data = $validator->validated();
         $data['idUser'] = $userId;
+        $event = null;
 
         if (($data['status'] ?? null) === 'REGISTERED') {
             $event = Event::where('idEvent', $data['idEvent'])->firstOrFail();
@@ -169,6 +175,18 @@ class EventParticipationController extends Controller
         }
 
         $eventParticipation = EventParticipation::create($data);
+
+        if (($data['status'] ?? null) === 'REGISTERED') {
+            $event = $event ?? Event::where('idEvent', $data['idEvent'])->first();
+            if ($event) {
+                Notification::notifyUser(
+                    $userId,
+                    $event->idEvent,
+                    'Prijavljeni ste na događaj „'.$event->title.'”.',
+                    NotificationType::UPDATE
+                );
+            }
+        }
 
         return response()->json($eventParticipation, 201);
     }
@@ -317,7 +335,34 @@ class EventParticipationController extends Controller
             ], 422);
         }
 
-        $p->update($validator->validated());
+        $data = $validator->validated();
+        $previousStatus = $p->status instanceof ParticipationStatus
+            ? $p->status->value
+            : (string) $p->status;
+
+        $p->update($data);
+        $p->load('event');
+
+        $newStatus = $data['status'] ?? null;
+        if ($newStatus && $newStatus !== $previousStatus && $p->event) {
+            if ($newStatus === 'CANCELLED') {
+                Notification::notifyUser(
+                    $p->idUser,
+                    $p->idEvent,
+                    'Odjavili ste se sa događaja „'.$p->event->title.'”.',
+                    NotificationType::UPDATE
+                );
+            }
+
+            if ($newStatus === 'REGISTERED') {
+                Notification::notifyUser(
+                    $p->idUser,
+                    $p->idEvent,
+                    'Prijavljeni ste na događaj „'.$p->event->title.'”.',
+                    NotificationType::UPDATE
+                );
+            }
+        }
 
         return response()->json($p, 200);
     }

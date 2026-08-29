@@ -11,9 +11,26 @@ const Navbar = () => {
   const navigate = useNavigate();
   console.log(location.pathname);
   const[isAuth, setIsAuth] = useState(false);
+  const[unread, setUnread] = useState(0);
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsAuth(!!token);
+    if (!token) {
+      setUnread(0);
+      return;
+    }
+
+    const loadUnread = async () => {
+      try {
+        const res = await api.get("/notifications");
+        const list = Array.isArray(res.data) ? res.data : [];
+        setUnread(list.filter((n) => !n.seen).length);
+      } catch {
+        setUnread(0);
+      }
+    };
+
+    loadUnread();
   }, [location]);
   console.log("Location changed: ", location.pathname);
   console.log("isAuth:", isAuth);
@@ -48,9 +65,16 @@ const Navbar = () => {
     )}
 
     {isAuth && (
-     <button className="nav-link logout-btn" onClick={handleLogout} type="button">
-  Odjavi se
-</button>
+      <>
+        <NavLink to="/my-events" className="nav-link">Moje prijave</NavLink>
+        <NavLink to="/notifications" className="nav-link">
+          Obaveštenja
+          {unread > 0 && <span className="nav-badge">{unread > 9 ? "9+" : unread}</span>}
+        </NavLink>
+        <button className="nav-link logout-btn" onClick={handleLogout} type="button">
+          Odjavi se
+        </button>
+      </>
     )}
   </div>
 );

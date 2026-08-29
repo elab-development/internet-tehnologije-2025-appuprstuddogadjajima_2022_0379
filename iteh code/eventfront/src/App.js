@@ -12,6 +12,8 @@ import Events from './pages/Events';
 import CalendarPage from './pages/Calendar';
 import EventDetails from './pages/EventDetails';
 import CreateEvent from './pages/CreateEvent';
+import MyEvents from './pages/MyEvents';
+import Notifications from './pages/Notifications';
 import Footer from './components/Footer';
 import { RegisterPage } from "./pages/Register";
 
@@ -27,6 +29,8 @@ function App() {
           <Route path="/events/create" element={<CreateEvent />} />
           <Route path="/events/:id/edit" element={<CreateEvent />} />
           <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/my-events" element={<MyEvents />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route
   path="/login"
   element={

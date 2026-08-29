@@ -13,6 +13,7 @@ class NotificationController extends Controller
      * @OA\Schema(
      *     schema="Notification",
      *     type="object",
+     *
      *     @OA\Property(property="idNotification", type="integer", example=1),
      *     @OA\Property(property="idUser", type="integer", example=1),
      *     @OA\Property(property="idEvent", type="integer", example=5),
@@ -23,27 +24,31 @@ class NotificationController extends Controller
      *     @OA\Property(property="updated_at", type="string", format="date-time")
      * )
      */
-
     private function assertOwner(Notification $notification)
-{
-    if ($notification->idUser !== auth()->id()) {
-        abort(response()->json(['message' => 'Forbidden'], 403));
+    {
+        if ($notification->idUser !== auth()->id()) {
+            abort(response()->json(['message' => 'Forbidden'], 403));
+        }
     }
-}
+
     /**
      * @OA\Get(
      *     path="/api/notifications",
      *     summary="Prikaz svih notifikacija ulogovanog korisnika",
      *     tags={"Notifications"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Uspešno vraćena lista notifikacija",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/Notification")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Neautorizovan pristup"
@@ -52,7 +57,12 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        $notifications = Notification::where('idUser', auth()->id())->get();
+        $notifications = Notification::query()
+            ->where('idUser', auth()->id())
+            ->with(['event:idEvent,title,status,startAt'])
+            ->orderByDesc('idNotification')
+            ->get();
+
         return response()->json($notifications);
     }
 
@@ -72,21 +82,27 @@ class NotificationController extends Controller
      *     summary="Kreiranje nove notifikacije",
      *     tags={"Notifications"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"idEvent","message","type"},
+     *
      *             @OA\Property(property="idEvent", type="integer", example=5),
      *             @OA\Property(property="message", type="string", example="Podsetnik: događaj počinje sutra u 18h"),
      *             @OA\Property(property="type", type="string", example="REMINDER"),
      *             @OA\Property(property="seen", type="boolean", example=false)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Notifikacija uspešno kreirana",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Notification")
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Neautorizovan pristup"
@@ -97,30 +113,30 @@ class NotificationController extends Controller
      *     )
      * )
      */
-   public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'idEvent' => 'required|integer|exists:events,idEvent',
-        'message' => 'required|string',
-        'type' => 'required|string|in:REMINDER,UPDATE,CANCELLATION',
-        'seen' => 'sometimes|boolean',
-    ]);
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'idEvent' => 'required|integer|exists:events,idEvent',
+            'message' => 'required|string',
+            'type' => 'required|string|in:REMINDER,UPDATE,CANCELLATION',
+            'seen' => 'sometimes|boolean',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => 'Validacija nije prošla',
-            'errors' => $validator->errors()
-        ], 422);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validacija nije prošla',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $data = $validator->validated();
+        $data['idUser'] = auth()->id();
+        $data['seen'] = $data['seen'] ?? false;
+
+        $notification = Notification::create($data);
+
+        return response()->json($notification, 201);
     }
-
-    $data = $validator->validated();
-    $data['idUser'] = auth()->id();
-    $data['seen'] = $data['seen'] ?? false;
-
-    $notification = Notification::create($data);
-
-    return response()->json($notification, 201);
-}
 
     /**
      * Display the specified resource.
@@ -130,18 +146,23 @@ class NotificationController extends Controller
      *     summary="Prikaz jedne notifikacije",
      *     tags={"Notifications"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID notifikacije (idNotification)",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Uspešno vraćena notifikacija",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Notification")
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Neautorizovan pristup"
@@ -156,14 +177,15 @@ class NotificationController extends Controller
      *     )
      * )
      */
-   public function show($id)
-{
-    $notification = Notification::where('idNotification', $id)->firstOrFail();
-    if ($notification->idUser !== auth()->id()) {
-        return response()->json(['message' => 'Forbidden'], 403);
+    public function show($id)
+    {
+        $notification = Notification::where('idNotification', $id)->firstOrFail();
+        if ($notification->idUser !== auth()->id()) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        return response()->json($notification);
     }
-    return response()->json($notification);
-}
 
     /**
      * Show the form for editing the specified resource.
@@ -181,27 +203,35 @@ class NotificationController extends Controller
      *     summary="Izmena postojeće notifikacije",
      *     tags={"Notifications"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID notifikacije (idNotification)",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="idEvent", type="integer", example=5),
      *             @OA\Property(property="message", type="string", example="Ažurirana poruka notifikacije"),
      *             @OA\Property(property="type", type="string", example="UPDATE"),
      *             @OA\Property(property="seen", type="boolean", example=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Notifikacija uspešno izmenjena",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Notification")
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Neautorizovan pristup"
@@ -220,32 +250,32 @@ class NotificationController extends Controller
      *     )
      * )
      */
-   public function update(Request $request, $id)
-{
-    $notification = Notification::where('idNotification', $id)->firstOrFail();
+    public function update(Request $request, $id)
+    {
+        $notification = Notification::where('idNotification', $id)->firstOrFail();
 
-    if ($notification->idUser !== auth()->id()) {
-        return response()->json(['message' => 'Forbidden'], 403);
+        if ($notification->idUser !== auth()->id()) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'idEvent' => 'sometimes|required|integer|exists:events,idEvent',
+            'message' => 'sometimes|required|string',
+            'type' => 'sometimes|required|string|in:REMINDER,UPDATE,CANCELLATION',
+            'seen' => 'sometimes|required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validacija nije prošla',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $notification->update($validator->validated());
+
+        return response()->json($notification, 200);
     }
-
-    $validator = Validator::make($request->all(), [
-        'idEvent' => 'sometimes|required|integer|exists:events,idEvent',
-        'message' => 'sometimes|required|string',
-        'type' => 'sometimes|required|string|in:REMINDER,UPDATE,CANCELLATION',
-        'seen' => 'sometimes|required|boolean',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => 'Validacija nije prošla',
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
-    $notification->update($validator->validated());
-
-    return response()->json($notification, 200);
-}
 
     /**
      * Remove the specified resource from storage.
@@ -255,13 +285,16 @@ class NotificationController extends Controller
      *     summary="Brisanje notifikacije",
      *     tags={"Notifications"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID notifikacije (idNotification)",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Notifikacija uspešno obrisana"
@@ -281,16 +314,15 @@ class NotificationController extends Controller
      * )
      */
     public function destroy($id)
-{
-    $notification = Notification::where('idNotification', $id)->firstOrFail();
+    {
+        $notification = Notification::where('idNotification', $id)->firstOrFail();
 
-    if ($notification->idUser !== auth()->id()) {
-        return response()->json(['message' => 'Forbidden'], 403);
+        if ($notification->idUser !== auth()->id()) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $notification->delete();
+
+        return response()->json(['message' => 'Notifikacija je obrisana'], 200);
     }
-
-    $notification->delete();
-
-    return response()->json(['message' => 'Notifikacija je obrisana'], 200);
-}
-  
 }

@@ -1,0 +1,131 @@
+.notifications-page{
+  min-height: calc(100vh - 70px);
+  padding: 28px 18px;
+  background: #eef2f7;
+}
+
+.page-header{
+  max-width: 860px;
+  margin: 0 auto 16px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.page-header h1{
+  margin: 0;
+  font-size: 30px;
+  color: #0b1220;
+}
+
+.page-header p{
+  margin: 6px 0 0 0;
+  color: #475569;
+}
+
+.note-list{
+  max-width: 860px;
+  margin: 0 auto;
+  display: grid;
+  gap: 12px;
+}
+
+.note,
+.state{
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+}
+
+.note{
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.note.unseen{
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+
+.note-top{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.message{
+  margin: 0;
+  color: #0b1220;
+  font-weight: 600;
+}
+
+.muted,
+.when{
+  color: #64748b;
+  font-size: 13px;
+}
+
+.note-actions{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill{
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.pill.update{
+  background: rgba(59, 130, 246, 0.16);
+}
+
+.pill.cancellation{
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.pill.reminder{
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.state{
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+.state-error{
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #7f1d1d;
+}
+
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary{
+  background: #0b1220;
+  color: #ffffff;
+}
+
+.btn-ghost{
+  background: transparent;
+  border-color: #cbd5e1;
+  color: #0b1220;
+}
