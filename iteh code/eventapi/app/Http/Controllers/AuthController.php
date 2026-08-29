@@ -167,13 +167,23 @@ class AuthController extends Controller
             ], 422);
         }
 
+        $loginKey = 'login:'.strtolower((string) $request->input('email')).'|'.$request->ip();
 
+        if (RateLimiter::tooManyAttempts($loginKey, 5)) {
+            return response()->json([
+                'message' => 'Previše pokušaja prijave. Pokušaj ponovo za '.RateLimiter::availableIn($loginKey).' sekundi.',
+            ], 429);
+        }
 
         if(!Auth::attempt($validator->validated())){
+            RateLimiter::hit($loginKey, 60);
+
             return response()->json([
                 'message' => 'Neispravna email ili lozinka'
             ], 401);
         }
+
+        RateLimiter::clear($loginKey);
 
 
         $user = Auth::user();
@@ -224,13 +234,14 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $user = $request->user();
-        $request->user()->currentAccessToken()->delete();
+        $token = $request->user()->currentAccessToken();
+        if ($token instanceof \Laravel\Sanctum\PersonalAccessToken) {
+            $token->delete();
+        }
+
         return response()->json([
-            'message' => 'Uspesna odjava'
+            'message' => 'Uspesna odjava',
         ], 200);
-
-
     }
 
     //GET /api/me

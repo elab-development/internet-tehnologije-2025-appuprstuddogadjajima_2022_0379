@@ -45,4 +45,4 @@ php artisan config:clear
 php artisan migrate --force
 php artisan l5-swagger:generate || true
 
-exec php artisan serve --host=0.0.0.0 --port=8000
+exec php artisan serve --host=0.0.0.0 --port=8000 --no-reload
