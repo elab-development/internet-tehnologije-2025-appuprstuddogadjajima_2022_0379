@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api/api";
+import EventLocationMap from "../components/EventLocationMap";
 import "./EventDetails.css";
 
 function formatDT(dt) {
@@ -273,6 +274,8 @@ export default function EventDetails() {
             <span className="v">{categoryLabel}</span>
           </div>
         </div>
+
+        <EventLocationMap location={event.location} title={event.title} />
 
         <div className="actions">
           <button
