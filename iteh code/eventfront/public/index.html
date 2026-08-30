@@ -25,6 +25,11 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <script>
+      if (location.hostname.indexOf("railway.app") !== -1) {
+        window.API_BASE_URL = "https://eventapi-production-5bc2.up.railway.app/api";
+      }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

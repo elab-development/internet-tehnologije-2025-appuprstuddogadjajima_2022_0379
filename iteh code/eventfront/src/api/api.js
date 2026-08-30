@@ -10,7 +10,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined" && window.location.hostname.includes("railway.app")) {
+  if (typeof window !== "undefined" && window.API_BASE_URL) {
+    config.baseURL = window.API_BASE_URL;
+  } else if (typeof window !== "undefined" && window.location.hostname.includes("railway.app")) {
     config.baseURL = RAILWAY_API;
   } else if (process.env.REACT_APP_API_URL) {
     config.baseURL = process.env.REACT_APP_API_URL;
