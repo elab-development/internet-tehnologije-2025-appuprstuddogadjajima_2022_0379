@@ -276,6 +276,7 @@ export default function CreateEvent() {
                 <option value="ACTIVE">ACTIVE</option>
                 <option value="CANCELLED">CANCELLED</option>
                 <option value="DRAFT">DRAFT</option>
+                <option value="FINISHED">FINISHED</option>
               </select>
               {renderFieldError("status")}
             </div>

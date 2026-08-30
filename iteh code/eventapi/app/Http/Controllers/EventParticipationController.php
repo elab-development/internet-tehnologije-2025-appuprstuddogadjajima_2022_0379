@@ -182,7 +182,7 @@ class EventParticipationController extends Controller
                 Notification::notifyUser(
                     $userId,
                     $event->idEvent,
-                    'Prijavljeni ste na događaj „'.$event->title.'”.',
+                    'Prijavljeni ste na događaj "'.$event->title.'".',
                     NotificationType::UPDATE
                 );
             }
@@ -349,7 +349,7 @@ class EventParticipationController extends Controller
                 Notification::notifyUser(
                     $p->idUser,
                     $p->idEvent,
-                    'Odjavili ste se sa događaja „'.$p->event->title.'”.',
+                    'Odjavili ste se sa događaja "'.$p->event->title.'".',
                     NotificationType::UPDATE
                 );
             }
@@ -358,7 +358,7 @@ class EventParticipationController extends Controller
                 Notification::notifyUser(
                     $p->idUser,
                     $p->idEvent,
-                    'Prijavljeni ste na događaj „'.$p->event->title.'”.',
+                    'Prijavljeni ste na događaj "'.$p->event->title.'".',
                     NotificationType::UPDATE
                 );
             }

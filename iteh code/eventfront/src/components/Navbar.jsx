@@ -56,6 +56,7 @@ const Navbar = () => {
     <NavLink to="/" end className="nav-link">Početna</NavLink>
     <NavLink to="/events" className="nav-link">Događaji</NavLink>
     <NavLink to="/calendar" className="nav-link">Kalendar</NavLink>
+    <NavLink to="/stats" className="nav-link">Statistika</NavLink>
 
     {!isAuth && (
       <>

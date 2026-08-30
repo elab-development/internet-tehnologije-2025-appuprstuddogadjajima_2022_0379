@@ -14,6 +14,7 @@ import EventDetails from './pages/EventDetails';
 import CreateEvent from './pages/CreateEvent';
 import MyEvents from './pages/MyEvents';
 import Notifications from './pages/Notifications';
+import StatsPage from './pages/Stats';
 import Footer from './components/Footer';
 import { RegisterPage } from "./pages/Register";
 
@@ -31,6 +32,7 @@ function App() {
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/my-events" element={<MyEvents />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/stats" element={<StatsPage />} />
           <Route
   path="/login"
   element={

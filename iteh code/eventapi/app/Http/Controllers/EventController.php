@@ -117,7 +117,7 @@ class EventController extends Controller
             'endAt' => 'required|date|after_or_equal:startAt',
             'location' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
-            'status' => 'required|in:ACTIVE,CANCELLED,DRAFT',
+            'status' => 'required|in:ACTIVE,CANCELLED,DRAFT,FINISHED',
             'idCategory' => 'required|integer|exists:categories,idCategory',
             'idUser' => 'required|integer|exists:users,id',
         ]);
@@ -253,7 +253,7 @@ class EventController extends Controller
             'endAt' => 'sometimes|date|after_or_equal:startAt',
             'location' => 'sometimes|string|max:255',
             'capacity' => 'sometimes|integer|min:1',
-            'status' => 'sometimes|in:ACTIVE,CANCELLED,DRAFT',
+            'status' => 'sometimes|in:ACTIVE,CANCELLED,DRAFT,FINISHED',
             'idCategory' => 'sometimes|integer|exists:categories,idCategory',
             'idUser' => 'sometimes|integer|exists:users,id',
         ]);
@@ -271,8 +271,8 @@ class EventController extends Controller
             ? NotificationType::CANCELLATION
             : NotificationType::UPDATE;
         $message = $type === NotificationType::CANCELLATION
-            ? 'Događaj „'.$event->title.'” je otkazan.'
-            : 'Događaj „'.$event->title.'” je izmenjen.';
+            ? 'Događaj "'.$event->title.'" je otkazan.'
+            : 'Događaj "'.$event->title.'" je izmenjen.';
 
         $this->notifyRegisteredParticipants($event, $message, $type);
 
@@ -327,7 +327,7 @@ class EventController extends Controller
 
         $this->notifyRegisteredParticipants(
             $event,
-            'Događaj „'.$event->title.'” je obrisan.',
+            'Događaj "'.$event->title.'" je obrisan.',
             NotificationType::CANCELLATION
         );
 

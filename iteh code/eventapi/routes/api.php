@@ -6,6 +6,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventParticipationController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\GeocodeController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
 use App\Models\User;
@@ -26,6 +27,7 @@ Route::get('/events/{id}', [EventController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
 Route::get('/geocode', [GeocodeController::class, 'show']);
+Route::get('/stats', [StatsController::class, 'index']);
 
 // VERIFIED EMAIL
 Route::get('/email/verify/{id}', function (Request $request, $id) {

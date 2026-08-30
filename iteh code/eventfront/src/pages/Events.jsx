@@ -189,6 +189,7 @@ export default function EventsPage() {
               <option value="ALL">Svi</option>
               <option value="ACTIVE">ACTIVE</option>
               <option value="CANCELLED">CANCELLED</option>
+              <option value="DRAFT">DRAFT</option>
               <option value="FINISHED">FINISHED</option>
             </select>
           </div>

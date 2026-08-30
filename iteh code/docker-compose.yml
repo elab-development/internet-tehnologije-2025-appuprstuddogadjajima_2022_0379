@@ -32,6 +32,8 @@ services:
       DB_DATABASE: eventovi
       DB_USERNAME: eventhub
       DB_PASSWORD: eventhubpass
+      DB_CHARSET: utf8mb4
+      DB_COLLATION: utf8mb4_unicode_ci
       CACHE_STORE: file
       SESSION_DRIVER: file
       QUEUE_CONNECTION: sync

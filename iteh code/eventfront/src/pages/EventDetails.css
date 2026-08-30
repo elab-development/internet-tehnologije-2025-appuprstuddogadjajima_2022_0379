@@ -179,6 +179,16 @@
    border-color: rgba(239, 68, 68, 0.25);
  }
 
+ .status.draft{
+   background: rgba(245, 158, 11, 0.14);
+   border-color: rgba(245, 158, 11, 0.3);
+ }
+
+ .status.finished{
+   background: rgba(148, 163, 184, 0.35);
+   border-color: rgba(148, 163, 184, 0.45);
+ }
+
  .participants{
    margin-top: 22px;
    padding-top: 18px;
