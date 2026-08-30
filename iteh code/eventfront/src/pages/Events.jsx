@@ -2,7 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Events.css";
 
-const API_BASE = "http://localhost:8000"; 
+function eventsApiBase() {
+  if (typeof window !== "undefined" && window.location.hostname.includes("railway.app")) {
+    return "https://eventapi-production-5bc2.up.railway.app";
+  }
+  return "http://localhost:8000";
+} 
 
 function formatDT(dt) {
   if (!dt) return "-";
@@ -42,7 +47,7 @@ export default function EventsPage() {
 
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${API_BASE}/api/events`, {
+        const res = await fetch(`${eventsApiBase()}/api/events`, {
           headers: {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -96,7 +101,7 @@ export default function EventsPage() {
       try {
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`${API_BASE}/api/categories`, {
+        const res = await fetch(`${eventsApiBase()}/api/categories`, {
           headers: {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
